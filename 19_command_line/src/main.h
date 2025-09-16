@@ -1,6 +1,17 @@
-#include "main.h"
+#ifndef MAIN_H_
+#define MAIN_H_
 
-int main() {
-  terminal_display();
-  return 0;
-}
+#include <gtest/gtest.h>
+#include <limits.h>
+#include <pwd.h>
+#include <unistd.h>
+
+#include <cstdlib>
+#include <iostream>
+#include <string>
+
+using namespace std;
+
+#include "console.h"
+
+#endif
