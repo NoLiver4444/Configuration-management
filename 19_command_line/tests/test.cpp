@@ -1,21 +1,38 @@
 #include "test.h"
 
+std::string execCommand(const char* cmd) {
+  char buffer[128];
+  std::string result = "";
+  std::unique_ptr<FILE, decltype(&pclose)> pipe(popen(cmd, "r"), pclose);
+
+  if (!pipe) {
+    throw std::runtime_error("popen() failed!");
+  }
+
+  while (fgets(buffer, sizeof(buffer), pipe.get()) != nullptr) {
+    result += buffer;
+  }
+
+  return result;
+}
+
 int main() {
   testing::InitGoogleTest();
   return RUN_ALL_TESTS();
 }
 
-TEST(number_1_2, test_1) {
-  BinaryFileHandler *binary_file_handler =
-      new BinaryFileHandler("answ/out.bin");
+TEST(TerminalTest, ComparePromptWithCommandOutput) {
+  // Получаем вывод из кода
+  std::string codeOutput = get_terminal_prompt();
 
-  UserInfo user1("qwer", "+7-916-254-76-23", "@qwer");
-  UserInfo user2("asdf", "+7-456-632-81-28", "@asdf");
+  // Получаем вывод из терминальной команды (замените на вашу реальную команду)
+  std::string terminalOutput = execCommand("echo 'user@hostname:~$ '");
 
-  binary_file_handler->input_to_file(user1);
-  binary_file_handler->input_to_file(user2);
+  // Убираем возможные символы новой строки
+  terminalOutput.erase(
+      std::remove(terminalOutput.begin(), terminalOutput.end(), '\n'),
+      terminalOutput.end());
 
-  binary_file_handler->output_from_file();
-
-  delete binary_file_handler;
+  // Сравниваем результаты
+  EXPECT_EQ(codeOutput, terminalOutput);
 }

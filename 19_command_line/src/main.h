@@ -9,9 +9,11 @@
 #include <cstdlib>
 #include <iostream>
 #include <string>
+#include <vector>
 
 using namespace std;
 
+#include "backend.h"
 #include "console.h"
 
 #endif

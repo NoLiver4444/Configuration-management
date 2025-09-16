@@ -9,4 +9,7 @@
 
 using namespace std;
 
+#include "../src/backend.h"
+#include "../src/console.h"
+
 #endif
