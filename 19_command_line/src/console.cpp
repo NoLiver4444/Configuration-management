@@ -1,15 +1,18 @@
 #include "console.h"
 
 void terminal_display() {
-  string prompt = get_terminal_prompt();
+  CommandLine command_line;
   string command;
-  vector<string> tokens;
+
+  bool work = 1;
 
   cout << "Terminal:\n";
 
-  while (1) {
-    cout << prompt << " ";
-    cin >> command;
-    tokens = parser(command);
+  while (work) {
+    cout << command_line.get_prompt() << " ";
+    getline(cin, command);
+
+    command_line.parser(command);
+    command_line.check_command();
   }
 }
