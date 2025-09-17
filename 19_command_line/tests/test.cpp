@@ -27,7 +27,7 @@ int main() {
 }
 
 TEST(TerminalTest, CompareWithBashPrompt) {
-  CommandLine *command_line = new CommandLine();
+  CommandLine* command_line = new CommandLine();
 
   // Запускаем bash в интерактивном режиме и получаем приглашение
   std::string terminalOutput = execCommand("bash -i -c 'echo \"$PS1\"'");
@@ -45,9 +45,10 @@ TEST(TerminalTest, CompareWithBashPrompt) {
 }
 
 TEST(TerminalTest, Parser) {
-  CommandLine *command_line = new CommandLine();
+  CommandLine* command_line = new CommandLine();
 
-  vector<string> answ = {"sudo", "apt", "install", "firefox", "clementine", "vlc"};
+  vector<string> answ = {"sudo",    "apt",        "install",
+                         "firefox", "clementine", "vlc"};
 
   command_line->parser("sudo apt install firefox clementine vlc");
 

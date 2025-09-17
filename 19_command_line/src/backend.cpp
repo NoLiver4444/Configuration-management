@@ -14,7 +14,7 @@ CommandLine::CommandLine() {
 void CommandLine::get_terminal_prompt() {
   // Получаем имя пользователя
   uid_t uid = geteuid();
-  struct passwd *pw = getpwuid(uid);
+  struct passwd* pw = getpwuid(uid);
   if (pw) {
     prompt += pw->pw_name;
     prompt += "@";
@@ -82,9 +82,7 @@ void CommandLine::echo_command(const vector<string>& args) {
   cout << "\n";
 }
 
-void CommandLine::exit_command(const vector<string>& args) {
-  exit(0);
-}
+void CommandLine::exit_command(const vector<string>& args) { exit(0); }
 
 void CommandLine::ls_command(const vector<string>& args) {
   for (const auto& arg : args) {
@@ -100,10 +98,6 @@ void CommandLine::cd_command(const vector<string>& args) {
   cout << "\n";
 }
 
-string CommandLine::get_prompt() {
-  return prompt;
-}
+string CommandLine::get_prompt() { return prompt; }
 
-vector<string> CommandLine::get_tokens() {
-  return tokens;
-}
+vector<string> CommandLine::get_tokens() { return tokens; }
