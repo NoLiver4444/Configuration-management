@@ -1,0 +1,3 @@
+# Конфигурационный файл эмулятора терминала
+vfs_path = "./my_vfs"
+script_path = "./startup.txt"

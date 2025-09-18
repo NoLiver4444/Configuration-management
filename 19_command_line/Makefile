@@ -1,136 +1,101 @@
 # Компилятор и флаги
 CXX = g++
-CXXFLAGS = -Wall -Wextra -std=c++20 -pedantic-errors
-LDFLAGS = -lgtest -lgtest_main -lpthread
+CXXFLAGS = -Wall -Wextra -std=c++17 -pedantic-errors
+LDFLAGS = 
 
-# Исходные файлы
+# Директории
 SRC_DIR = src
-TEST_DIR = tests
+CORE_DIR = $(SRC_DIR)/core
+UTILS_DIR = $(SRC_DIR)/utils
 OBJ_DIR = obj
-GCOV_DIR = obj/gcov
-TESTS_OBJ_DIR = obj/tests
-REPORT_DIR = report
 BIN_DIR = bin
+CONFIG_DIR = config
+SCRIPTS_DIR = scripts
 
-TARGET = test
-MAIN_TARGET = main_program
-GCOV_TARGET = gcov_report
-LIBRARY = prac_1.a
-GCOV_LIBRARY = preac_1_gcov.a
-
-LCOV_FLAGS = -fprofile-arcs -ftest-coverage
+# Цели
+TARGET = terminal
 
 # Исходные файлы
-SRCS = $(wildcard $(SRC_DIR)/*.cpp $(SRC_DIR)/s21_AVL_Tree/*.cpp $(SRC_DIR)/s21_set/*.cpp)
-# Исключаем main.cpp из библиотечных файлов
-LIB_SRCS = $(filter-out $(SRC_DIR)/main.cpp, $(SRCS))
-OBJS = $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(SRCS))
-LIB_OBJS = $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(LIB_SRCS))
-TEST_SRCS = $(wildcard $(TEST_DIR)/*.cpp)
-TEST_OBJS = $(patsubst $(TEST_DIR)/%.cpp,$(TESTS_OBJ_DIR)/%.o,$(TEST_SRCS))
+SRCS = $(SRC_DIR)/main.cpp \
+       $(CORE_DIR)/commandline.cpp \
+       $(CORE_DIR)/config.cpp \
+       $(UTILS_DIR)/console.cpp
 
-# Найти main файл
-MAIN_SRC = $(wildcard $(SRC_DIR)/main.cpp)
-MAIN_OBJ = $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(MAIN_SRC))
+OBJS = $(SRCS:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
 
-.PHONY: all test main gcov_report clean rebuild style leaks valgrind answ
+.PHONY: all clean rebuild run test help install
 
-all: main test
+# Основная цель
+all: $(BIN_DIR)/$(TARGET)
 
-main: $(MAIN_TARGET)
+# Сборка исполняемого файла
+$(BIN_DIR)/$(TARGET): $(OBJS) | $(BIN_DIR)
+	$(CXX) $(CXXFLAGS) $(OBJS) -o $@ $(LDFLAGS)
+	@echo "\n\033[0;32m✅ Terminal compiled successfully!\033[0m"
+	@echo "🚀 Run with: ./$(BIN_DIR)/$(TARGET)"
 
-test: $(TARGET)
-
-# Компиляция основной программы
-$(MAIN_TARGET): $(OBJ_DIR) $(BIN_DIR) $(LIB_OBJS) $(MAIN_OBJ)
-	$(CXX) $(CXXFLAGS) $(LIB_OBJS) $(MAIN_OBJ) -o $(BIN_DIR)/$@
-	@echo "\n\033[0;32mMain program compiled successfully!\033[0m\n"
-	@echo "Run with: ./$(BIN_DIR)/$(MAIN_TARGET)"
-
-# Запуск основной программы
-run: $(MAIN_TARGET)
-	@echo "\n\033[0;32mRunning main program...\033[0m\n"
-	@./$(BIN_DIR)/$(MAIN_TARGET)
-
-# ИСПРАВЛЕННАЯ цель gcov_report - используем только библиотечные файлы без main
-gcov_report: clean
-	$(CXX) $(CXXFLAGS) $(LCOV_FLAGS) $(TEST_SRCS) $(LIB_SRCS) -o $(GCOV_TARGET) $(LDFLAGS) -lgcov
-	./$(GCOV_TARGET)
-	lcov --ignore-errors mismatch --capture --directory . --output-file coverage.info
-	lcov --remove coverage.info "/usr/*" "tests" --output-file coverage.info.cleaned
-	genhtml coverage.info.cleaned --output-directory coverage
-	@echo "\n\033[0;32mCoverage report generated in coverage/ directory\033[0m\n"
-
-# Компиляция тестов
-$(TARGET): $(TESTS_OBJ_DIR) $(OBJ_DIR) $(LIBRARY) $(TEST_OBJS)
-	$(CXX) $(CXXFLAGS) $(TEST_OBJS) $(LIBRARY) $(LDFLAGS) -o $@
-	@echo "\n\033[0;32mTests compiled successfully!\033[0m\n"
-	@echo "Run with: make test_run"
-
-# Запуск тестов
-test_run: $(TARGET)
-	@echo "\n\033[0;32mRunning tests...\033[0m\n"
-	@./$(TARGET)
-
-$(LIBRARY): $(LIB_OBJS)
-	ar rcs $@ $^
-
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
+# Компиляция объектных файлов
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp | $(OBJ_DIR)
 	@mkdir -p $(@D)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-$(TESTS_OBJ_DIR)/%.o: $(TEST_DIR)/%.cpp
-	@mkdir -p $(@D)
-	$(CXX) $(CXXFLAGS) -c $< -o $@
-
+# Создание директорий
 $(OBJ_DIR):
-	@mkdir -p $(OBJ_DIR)
-
-$(TESTS_OBJ_DIR):
-	@mkdir -p $(TESTS_OBJ_DIR)
+	mkdir -p $(OBJ_DIR) $(OBJ_DIR)/core $(OBJ_DIR)/utils
 
 $(BIN_DIR):
-	@mkdir -p $(BIN_DIR)
+	mkdir -p $(BIN_DIR)
 
+# Запуск программы
+run: all
+	@echo "\n\033[0;32m🎯 Running terminal...\033[0m\n"
+	./$(BIN_DIR)/$(TARGET)
+
+# Запуск с тестовыми параметрами
+test: all
+	@echo "\n\033[0;32m🧪 Testing with config...\033[0m\n"
+	./$(BIN_DIR)/$(TARGET) --config $(CONFIG_DIR)/config.toml
+
+# Запуск со скриптом
+test-script: all
+	@echo "\n\033[0;32m📜 Testing with script...\033[0m\n"
+	./$(BIN_DIR)/$(TARGET) --script $(SCRIPTS_DIR)/startup.txt
+
+# Показать структуру проекта
+tree:
+	@echo "\n\033[0;36m📁 Project structure:\033[0m"
+	@find . -type d -name "bin" -prune -o -type d -name "obj" -prune -o -type f -print | head -20
+	@echo "..."
+
+# Создать стандартную структуру папок
+init:
+	mkdir -p $(SRC_DIR)/core $(SRC_DIR)/utils $(OBJ_DIR) $(BIN_DIR) \
+	         $(CONFIG_DIR) $(SCRIPTS_DIR) tests docs
+	@echo "\n\033[0;32m📁 Project structure created!\033[0m"
+
+# Очистка
 clean:
-	rm -rf $(OBJ_DIR) $(REPORT_DIR) $(GCOV_DIR) $(TESTS_OBJ_DIR) $(BIN_DIR)
-	rm -f *.a *.o *.gcno *.gcda *.gcov coverage.info
-	rm -f $(TARGET) $(GCOV_TARGET) $(MAIN_TARGET)
-	rm -rf coverage
-	rm -f coverage.info.cleaned
-	rm -f answ/*.bin
-	rm -f answ/*.txt
+	rm -rf $(OBJ_DIR) $(BIN_DIR)
+	@echo "\n\033[0;32m🧹 Clean completed!\033[0m"
 
+# Полная очистка
+distclean: clean
+	rm -f *.log *.tmp
+	@echo "\n\033[0;32m🧹 Deep clean completed!\033[0m"
+
+# Пересборка
 rebuild: clean all
 
-clang:
-	cp ../materials/.clang-format ./.clang-format
-	clang-format -n --style=file $$(find . -type f \( -name "*.tpp" -o -name "*.h" -o -name "*.cpp" \))
-	rm -f .clang-format
-
-clang-fix:
-	cp ../materials/.clang-format ./.clang-format
-	clang-format -i --style=file $$(find . -type f \( -name "*.tpp" -o -name "*.h" -o -name "*.cpp" \))
-	rm -f .clang-format
-
-leaks: $(TARGET)
-	leaks --atExit -- ./$(TARGET)
-
-valgrind: $(TARGET)
-	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --verbose ./$(TARGET)
-
-answ:
-	mkdir -p answ
-
+# Помощь
 help:
-	@echo "Available commands:"
-	@echo "  make all       - Build both main program and tests"
-	@echo "  make main      - Build only main program"
-	@echo "  make run       - Build and run main program"
-	@echo "  make test      - Build only tests"
-	@echo "  make test_run  - Build and run tests"
-	@echo "  make gcov_report - Generate coverage report"
-	@echo "  make clean     - Clean all build artifacts"
-	@echo "  make rebuild   - Clean and rebuild everything"
-	@echo "  make leaks     - Run tests with leaks detection"
-	@echo "  make valgrind  - Run tests with valgrind"
+	@echo "\n\033[1;34m📋 Available commands:\033[0m"
+	@echo "  \033[0;32mmake all\033[0m        - Build terminal (default)"
+	@echo "  \033[0;32mmake run\033[0m        - Build and run terminal"
+	@echo "  \033[0;32mmake test\033[0m       - Test with config file"
+	@echo "  \033[0;32mmake test-script\033[0m - Test with script"
+	@echo "  \033[0;32mmake tree\033[0m       - Show project structure"
+	@echo "  \033[0;32mmake init\033[0m       - Create project structure"
+	@echo "  \033[0;32mmake clean\033[0m      - Clean build artifacts"
+	@echo "  \033[0;32mmake distclean\033[0m  - Deep clean"
+	@echo "  \033[0;32mmake rebuild\033[0m    - Clean and rebuild"
+	@echo "  \033[0;32mmake help\033[0m       - Show this help"

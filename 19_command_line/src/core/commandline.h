@@ -1,7 +1,7 @@
 #ifndef BACKEND_H_
 #define BACKEND_H_
 
-#include "main.h"
+#include "../main.h"
 
 class CommandLine {
  private:

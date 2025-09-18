@@ -1,4 +1,4 @@
-#include "backend.h"
+#include "commandline.h"
 
 CommandLine::CommandLine() {
   get_terminal_prompt();
@@ -34,7 +34,9 @@ void CommandLine::get_terminal_prompt() {
     string home_dir = pw ? pw->pw_dir : "";
     string current_dir = cwd;
 
-    if (!home_dir.empty() && current_dir.find(home_dir) == 0) {
+    if (!home_dir.empty() && current_dir == home_dir) {
+      current_dir = "~";
+    } else if (!home_dir.empty() && current_dir.find(home_dir + "/") == 0) {
       current_dir = "~" + current_dir.substr(home_dir.length());
     }
 
@@ -58,6 +60,8 @@ void CommandLine::parser(string command) {
 }
 
 void CommandLine::check_command() {
+  if (tokens.empty()) return;
+
   std::vector<std::string> args(tokens.begin() + 1, tokens.end());
 
   if (commands.find(tokens[0]) != commands.end()) {
@@ -82,20 +86,37 @@ void CommandLine::echo_command(const vector<string>& args) {
   cout << "\n";
 }
 
-void CommandLine::exit_command(const vector<string>& args) { exit(0); }
+void CommandLine::exit_command(const vector<string>& args) {
+  int exit_code = 0;
+  if (!args.empty()) {
+    try {
+      exit_code = std::stoi(args[0]);
+    } catch (...) {
+      cout << "Invalid exit code: " << args[0] << "\n";
+      exit_code = 1;
+    }
+  }
+  exit(exit_code);
+}
 
 void CommandLine::ls_command(const vector<string>& args) {
+  cout << "Command 'ls' executed with arguments: ";
   for (const auto& arg : args) {
     cout << arg << " ";
   }
-  cout << "\n";
+  cout << "(stub implementation)\n";
 }
 
 void CommandLine::cd_command(const vector<string>& args) {
-  for (const auto& arg : args) {
-    cout << arg << " ";
+  if (args.empty()) {
+    // cd без аргументов - переход в домашнюю директорию
+    cout << "Changing to home directory (stub)\n";
+  } else {
+    cout << "Changing directory to: " << args[0] << " (stub)\n";
   }
-  cout << "\n";
+
+  prompt.clear();
+  get_terminal_prompt();
 }
 
 string CommandLine::get_prompt() { return prompt; }

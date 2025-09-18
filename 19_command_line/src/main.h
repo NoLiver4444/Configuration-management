@@ -7,13 +7,17 @@
 #include <unistd.h>
 
 #include <cstdlib>
+#include <cstring>
+#include <filesystem>
+#include <fstream>
 #include <iostream>
 #include <string>
 #include <vector>
 
 using namespace std;
 
-#include "backend.h"
-#include "console.h"
+#include "core/commandline.h"
+#include "utils/console.h"
+#include "core/config.h"
 
 #endif

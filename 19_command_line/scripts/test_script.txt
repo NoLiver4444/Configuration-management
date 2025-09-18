@@ -1,0 +1,8 @@
+# Тестовый скрипт для эмулятора
+echo "Starting terminal emulator..."
+help
+echo "Testing ls command:"
+ls -la
+echo "Testing cd command:"
+cd /home/user
+echo "Script completed successfully!"

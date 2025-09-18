@@ -1,0 +1,5 @@
+# startup.txt
+echo "Добро пожаловать!"
+cd /projects
+ls -la
+echo "Готов к работе!"
