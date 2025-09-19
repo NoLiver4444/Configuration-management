@@ -1,0 +1,13 @@
+# Базовый тест VFS
+echo "=== Basic VFS Test ==="
+echo "Current directory:"
+pwd
+echo "Root contents:"
+ls /
+echo "Changing to folder1:"
+cd folder1
+echo "Contents of folder1:"
+ls
+echo "Reading file2.txt:"
+cat file2.txt
+echo "=== Test Completed ==="

@@ -1,4 +1,9 @@
-# Скрипт с ошибкой для тестирования
-echo "This command will work"
-unknown_command_that_will_fail
-echo "This line should not be executed"
+# Тест обработки ошибок
+echo "=== Error Handling Test ==="
+echo "Testing non-existent directory:"
+cd non_existent_dir
+echo "Testing non-existent file:"
+cat non_existent_file.txt
+echo "Testing invalid path:"
+ls /invalid/path
+echo "=== Error Test Completed ==="

@@ -1,9 +1,13 @@
-#ifndef CONSOLE_H_
-#define CONSOLE_H_
+#ifndef CONSOLE_H
+#define CONSOLE_H
 
-#include "../main.h"
+#include <string>
+#include "../core/vfs_manager.h"
 
-void terminal_display();
-void execute_script(const std::string& script_path);
+// Объявляем forward declaration чтобы избежать circular includes
+class CommandLine;
+
+void terminal_display(VFSManager& vfs);
+void execute_script(const std::string& script_path, VFSManager& vfs);
 
 #endif

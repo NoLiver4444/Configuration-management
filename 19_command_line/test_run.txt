@@ -1,0 +1,11 @@
+# Базовый тест
+./bin/terminal --config config/basic_test.toml
+
+# Полный тест
+./bin/terminal --config config/full_test.toml
+
+# Тест ошибок
+./bin/terminal --config config/error_test.toml
+
+# Тест с кастомной VFS
+./bin/terminal --config config/full_test.toml --vfs-path custom_vfs
